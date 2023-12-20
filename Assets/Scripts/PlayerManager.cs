@@ -11,6 +11,12 @@ public class PlayerManager : MonoBehaviour
         get { return life; }
         set { life = value; }
     }
+    private string pName = "hector";
+    public string Pname
+    {
+        get { return pName; }
+        set { pName = value; }
+    }
     public Vector3 speed = new Vector3(0, 0, 0);
     private int score = 0;
     public int Score

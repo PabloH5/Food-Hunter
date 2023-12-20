@@ -5,6 +5,7 @@ using UnityEngine;
 public class FollowPlayer : MonoBehaviour
 {
     private GameObject player;
+    Vector3 initialPos;
     void Start()
     {
         if (GameObject.Find("Ghost") != null)
@@ -12,6 +13,7 @@ public class FollowPlayer : MonoBehaviour
             player = GameObject.Find("Ghost");
         }
         else { Debug.LogWarning("The Ghost can't be found."); }
+        initialPos = transform.position;
     }
 
     void Update()
@@ -23,7 +25,7 @@ public class FollowPlayer : MonoBehaviour
         Vector3 followPosition;
         if (player != null)
         {
-            followPosition = new Vector3(player.transform.position.x, player.transform.position.y + 1.5f, 0.5f);
+            followPosition = new Vector3(initialPos.x - 100 + player.transform.position.x * 120, initialPos.y + player.transform.position.y, 0.5f);
         }
         else
         {

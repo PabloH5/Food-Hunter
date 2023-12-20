@@ -16,7 +16,9 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Text nameTxt;
     [SerializeField]
-    private GameObject gameOver;
+    private GameObject gameOverPanel;
+    [SerializeField]
+    private GameObject newRecordPanel;
 
     [SerializeField]
     private List<GameObject> foodList = new List<GameObject>();
@@ -31,7 +33,6 @@ public class GameManager : MonoBehaviour
     private GameObject menuManager;
     void Start()
     {
-
         if (GameObject.Find("Ghost") != null)
         {
             player = GameObject.Find("Ghost");
@@ -39,46 +40,58 @@ public class GameManager : MonoBehaviour
         }
         else { Debug.LogWarning("The Ghost can't be found."); }
 
-        if (GameObject.Find("MenuManager") != null)
+        if (GameObject.Find("MenuController") != null)
         {
-            menuManager = GameObject.Find("MenuManager");
+            menuManager = GameObject.Find("MenuController");
+            player.GetComponent<PlayerManager>().Pname = menuManager.GetComponent<MenuManager>().Pname;
+            player.GetComponent<PlayerManager>().BestScore = menuManager.GetComponent<MenuManager>().BestScore;
         }
         else { Debug.LogWarning("The Menu Manager can't be found."); }
+
     }
     void Update()
     {
         if (player != null)
         {
-            lifePlayer = player.GetComponent<PlayerManager>().Life;
-            scorePlayer = player.GetComponent<PlayerManager>().Score;
-            bestScorePlayer = player.GetComponent<PlayerManager>().BestScore;
-
-            lifeTxt.text = "X" + lifePlayer;
-            scoreTxt.text = "Score: " + scorePlayer;
-            bestScoreTxt.text = "Best Score: " + bestScorePlayer;
-            UpdateTextBox(lifePlayer, scorePlayer, bestScorePlayer);
+            AsignPlayerFields();
+            UpdateTextBox(lifePlayer, scorePlayer, bestScorePlayer, namePlayer);
+            CheckNewRecord();
             CheckAlive();
         }
         else { Debug.LogWarning("The Ghost can't be found."); }
-
+    }
+    void CheckNewRecord()
+    {
+        if (player.GetComponent<PlayerManager>().BestScore < player.GetComponent<PlayerManager>().Score)
+        {
+            player.GetComponent<PlayerManager>().BestScore = player.GetComponent<PlayerManager>().Score;
+            menuManager.GetComponent<MenuManager>().BestScore = player.GetComponent<PlayerManager>().Score;
+            newRecordPanel.SetActive(true);
+            Invoke("DesactiveNewRecord", 2.0f);
+        }
     }
     void CheckAlive()
     {
         if (player.GetComponent<PlayerManager>().Life <= 0)
         {
-            if (player.GetComponent<PlayerManager>().BestScore < player.GetComponent<PlayerManager>().Score)
-            {
-                player.GetComponent<PlayerManager>().BestScore = player.GetComponent<PlayerManager>().Score;
-            }
-            gameOver.SetActive(true);
+            gameOverPanel.SetActive(true);
+            menuManager.GetComponent<MenuManager>().SavePrefs(bestScorePlayer, namePlayer);
             Destroy(player);
         }
     }
-    void UpdateTextBox(int life, int score, int bScore)
+    void AsignPlayerFields()
+    {
+        lifePlayer = player.GetComponent<PlayerManager>().Life;
+        scorePlayer = player.GetComponent<PlayerManager>().Score;
+        bestScorePlayer = player.GetComponent<PlayerManager>().BestScore;
+        namePlayer = player.GetComponent<PlayerManager>().Pname;
+    }
+    void UpdateTextBox(int life, int score, int bScore, string name)
     {
         lifeTxt.text = "X" + life;
         scoreTxt.text = "Score: " + score;
         bestScoreTxt.text = "Best Score: " + bScore;
+        nameTxt.text = name.ToUpper();
     }
     void InstantiateFood()
     {
@@ -93,17 +106,22 @@ public class GameManager : MonoBehaviour
         }
         else { Debug.Log("Dead"); }
     }
+    void DesactiveNewRecord()
+    {
+        newRecordPanel.SetActive(false);
+    }
     Vector3 RandomPos()
     {
         return new Vector3(Random.Range(-8, 8), 9, 0);
     }
     public void LoadMainScene()
     {
-        gameOver.SetActive(false);
+        gameOverPanel.SetActive(false);
         SceneManager.LoadScene("main");
     }
     public void ExitAplication()
     {
+        menuManager.GetComponent<MenuManager>().SavePrefs(bestScorePlayer, namePlayer);
         Application.Quit();
     }
 }
