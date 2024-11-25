@@ -92,13 +92,13 @@ public class PlayerManager : MonoBehaviour
         }
         if (other.gameObject.CompareTag("HealtlyFood"))
         {
-            if (Life < 5)
+            if (Life < 3)
             {
                 Life += 1; // Increase life when colliding with HealtlyFood, if life is less than 5.
             }
             else
             {
-                Score += 1; // Otherwise, increase score.
+                Score += 10; // Otherwise, increase score.
             }
         }
     }
